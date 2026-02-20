@@ -87,7 +87,7 @@ unsigned char c = static_cast<unsigned char>(cfg.text[i]);
              << "dominant-baseline=\"middle\" "
              << "transform=\"rotate(" << angleDeg
              << " " << tx << " " << ty << ")\">"
-             << "&#" << static_cast<unsigned int>(c) << ";" // Ok for & and other special caracter.
+             << "&#" << static_cast<unsigned int>(c) << ";" // Ok for & and other special character.
              << "</text>\n";
     }
 
