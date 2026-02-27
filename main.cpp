@@ -7,6 +7,9 @@
 
 constexpr double PI = 3.14159265358979323846;
 
+bool initialHoleHere = true;
+int numberRing = 0;
+
 struct Ring {
     std::string text;
     double ringWidth;     // largeur radiale en mm
@@ -60,8 +63,20 @@ void drawRing(std::ofstream& file,
              << x4 << " " << y4 << " Z\" "
              << "fill=\"none\" stroke=\"black\" stroke-width=\"0.3\"/>\n";
 
-
               unsigned char c = static_cast<unsigned char>(text[i]); // Ok for & and other special character.
+
+if (initialHoleHere && (numberRing == 2) && (static_cast<unsigned int>(c) == 32 )){
+        int bonusRadius = 2;
+ auto [x3,y3] = polar(cx,cy,Rint+bonusRadius,a2);
+        auto [x4,y4] = polar(cx,cy,Rint+bonusRadius,a1);
+
+        file << "<path d=\""
+             << "M "
+            << x3 << " " << y3 << " "
+             << "A " << Rint + bonusRadius << " " << Rint + bonusRadius << " 0 0 0 "
+             << x4 << " " << y4 << "\" "
+             << "fill=\"none\" stroke=\"black\" stroke-width=\"3\"/>\n";
+}
    float fontHighCoef = 1.0;
 if (static_cast<unsigned int>(c) == 44) // "," for comma, apostrophe, half ", diacritical on the next character...
 {
@@ -71,14 +86,10 @@ else
 {
     fontHighCoef = 1.0;
 }
-
         double rText = (fontHighCoef*Rext + Rint)/(fontHighCoef + 1.0);
         auto [tx,ty] = polar(cx,cy,rText,amid);
         double angleDeg = amid * 180.0 / PI + 90.0;
-
-
-
-        file << "<text x=\"" << tx << "\" y=\"" << ty << "\" ";
+       file << "<text x=\"" << tx << "\" y=\"" << ty << "\" ";
            float fontSizeCoef = 1.0;
 if (static_cast<unsigned int>(c) == 44) // "," for comma, apostrophe, half ", diacritical on the next character...
 {
@@ -120,6 +131,7 @@ void generateSVG(const Config& cfg)
 
     for (const auto& ring : cfg.rings)
     {
+        numberRing = numberRing +1;
         double Rext = Rcurrent;
         double Rint = Rext - ring.ringWidth;
 
@@ -129,19 +141,16 @@ void generateSVG(const Config& cfg)
         Rcurrent = Rint - ring.spacingAfter;
     }
 
- // Espace entre le rotor et le stator :
+ // Space between rotor and stator:
  int radiuscut = 60; // (cfg.outerDiameter / 2) - ringWidth1 - ringWidth2;
-
-
  file << "<circle cx=\"" << cx
          << "\" cy=\"" << cy
          << "\"  r=\""<< radiuscut << "\"  style=\"stroke:black; fill:none\" />\n";
 
-
-    // moyeu central
+    // Center hole:
     file << "<circle cx=\"" << cx
          << "\" cy=\"" << cy
-         << "\" r=\"1\" fill=\"black\" />\n";
+         << "\" r=\"0.2\" fill=\"black\" />\n";
 
     file << "</svg>\n";
 }
@@ -149,8 +158,8 @@ void generateSVG(const Config& cfg)
 int main()
 {
     Config cfg;
-    cfg.outerDiameter = 180.0; // tient proprement sur A4
-    cfg.fontSize = 3.0;        // en mm
+    cfg.outerDiameter = 180.0; // Good in a A4 paper.
+    cfg.fontSize = 3.0;        // In mm.
     cfg.output = "triple_A4.svg";
 
     cfg.rings = {
@@ -160,6 +169,5 @@ int main()
     };
 
     generateSVG(cfg);
-
-    std::cout << "SVG A4 inscrit.\n";
+    std::cout << "SVG A4 Ok.\n";
 }
