@@ -1,3 +1,3 @@
 # CipherWheel
-Make a SVG cipher wheel.
-Compatible with & and other special character.
+Make a SVG and PDF cipher wheel. (Finished)
+Compatible with "&" and other special character.
